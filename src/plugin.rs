@@ -1,5 +1,7 @@
 //! Provides a [`Plugin`] for making skyboxes with procedural sky textures.
 
+use std::marker::PhantomData;
+
 use bevy::{
     asset::load_internal_asset,
     pbr::{NotShadowCaster, NotShadowReceiver},
@@ -17,9 +19,17 @@ use crate::{
 
 /// A [`Plugin`] that adds the prerequisites for a procedural sky.
 #[derive(Debug, Clone, Copy)]
-pub struct AtmospherePlugin;
+pub struct AtmospherePlugin<P: CameraProjection + Component> {
+    _p: PhantomData<P>,
+}
 
-impl Plugin for AtmospherePlugin {
+impl<P: CameraProjection + Component> AtmospherePlugin<P> {
+    pub fn new() -> Self {
+        Self { _p: PhantomData }
+    }
+}
+
+impl<P: CameraProjection + Component> Plugin for AtmospherePlugin<P> {
     fn build(&self, app: &mut App) {
         load_internal_asset!(
             app,
@@ -50,7 +60,7 @@ impl Plugin for AtmospherePlugin {
             app.add_system_set_to_stage(
                 CoreStage::PostUpdate,
                 SystemSet::new()
-                    .with_system(atmosphere_insert)
+                    .with_system(atmosphere_insert::<P>)
                     .with_system(atmosphere_remove),
             );
         }
@@ -77,11 +87,11 @@ pub struct AtmosphereSkyBox;
 
 /// Inserts a skybox when the [`AtmosphereCamera`] component is added.
 #[cfg(feature = "detection")]
-fn atmosphere_insert(
+fn atmosphere_insert<P: CameraProjection + Component>(
     mut commands: Commands,
     mut mesh_assets: ResMut<Assets<Mesh>>,
     material: Res<AtmosphereSkyBoxMaterial>,
-    atmosphere_cameras: Query<(Entity, &Projection, &AtmosphereCamera), Added<AtmosphereCamera>>,
+    atmosphere_cameras: Query<(Entity, &P, &AtmosphereCamera), Added<AtmosphereCamera>>,
 ) {
     for (camera, projection, atmosphere_camera) in &atmosphere_cameras {
         #[cfg(feature = "bevy/trace")]

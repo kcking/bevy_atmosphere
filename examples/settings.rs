@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, render::camera::Projection};
 use bevy_atmosphere::prelude::*;
 use bevy_spectator::*;
 
@@ -6,7 +6,7 @@ fn main() {
     App::new()
         .insert_resource(AtmosphereSettings { resolution: 16 })
         .add_plugins(DefaultPlugins)
-        .add_plugin(AtmospherePlugin)
+        .add_plugin(AtmospherePlugin::<Projection>::new())
         .add_plugin(SpectatorPlugin)
         .add_startup_system(setup)
         .add_system(change_resolution)

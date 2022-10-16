@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, render::camera::Projection};
 use bevy_atmosphere::prelude::*;
 use bevy_spectator::*;
 
@@ -12,7 +12,7 @@ fn main() {
         )))
         .add_plugins(DefaultPlugins)
         .add_plugin(SpectatorPlugin) // Simple movement for this example
-        .add_plugin(AtmospherePlugin) // Default AtmospherePlugin
+        .add_plugin(AtmospherePlugin::<Projection>::new()) // Default AtmospherePlugin
         .add_startup_system(setup_environment)
         .add_system(daylight_cycle)
         .run();

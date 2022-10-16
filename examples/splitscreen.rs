@@ -4,7 +4,10 @@
 use bevy::{
     core_pipeline::clear_color::ClearColorConfig,
     prelude::*,
-    render::{camera::Viewport, view::RenderLayers},
+    render::{
+        camera::{Projection, Viewport},
+        view::RenderLayers,
+    },
     window::{WindowId, WindowResized},
 };
 use bevy_atmosphere::prelude::*;
@@ -17,7 +20,7 @@ fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
-        .add_plugin(AtmospherePlugin)
+        .add_plugin(AtmospherePlugin::<Projection>::new())
         .add_startup_system(setup)
         .add_system(set_camera_viewports)
         .run();
